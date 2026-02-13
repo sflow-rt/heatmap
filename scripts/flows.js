@@ -10,8 +10,8 @@ if(getSystemProperty('heatmap.update')) options.update = parseFloat(getSystemPro
 if(getSystemProperty('heatmap.radius')) options.radius = parseFloat(getSystemProperty('heatmap.radius'));
 if(getSystemProperty('heatmap.height')) options.height = getSystemProperty('heatmap.height');
 
-var agents    = getSystemProperty('heatmap.agents')    || 'ALL';
-var aggMode   = getSystemProperty('heatmap.aggMode')   || 'MAX';
+var agents    = (getSystemProperty('heatmap.agents')   || 'ALL').toUpperCase();
+var aggMode   = (getSystemProperty('heatmap.aggMode')  || 'max').toLowerCase();
 var maxFlows  = getSystemProperty('heatmap.maxFlows')  || '1000';
 var t         = getSystemProperty('heatmap.t')         || '2';
 var n         = getSystemProperty('heatmap.n')         || '20';
