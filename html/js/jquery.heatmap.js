@@ -25,6 +25,7 @@
         options: {
             axisShow: true,
             axisColor: '#eee',
+            axisInset: 0,
             radius: 10
         },
 
@@ -85,6 +86,17 @@
                 ctx.beginPath();
                 ctx.moveTo(0, 0);
                 ctx.lineTo(w, h);
+                if(this.options.axisInset) {
+                    let inset = this.options.axisInset;
+                    ctx.moveTo(w * inset, 0);
+                    ctx.lineTo(w * inset, h);
+                    ctx.moveTo(w - (w * inset), 0);
+                    ctx.lineTo(w - (w * inset), h);
+                    ctx.moveTo(0, h * inset);
+                    ctx.lineTo(w, h * inset);
+                    ctx.moveTo(0, h - (h * inset));
+                    ctx.lineTo(w, h - (h * inset));
+                }
                 ctx.stroke();
             }
         }

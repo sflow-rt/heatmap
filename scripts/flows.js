@@ -20,6 +20,9 @@ var filter    = getSystemProperty('heatmap.filter')    || null;
 var minIP     = getSystemProperty('heatmap.ip.start')  || '0.0.0.0';
 var maxIP     = getSystemProperty('heatmap.ip.end')    || '255.255.255.255';
 var ipLayer   = getSystemProperty('heatmap.ip.layer')  || '';
+var inset     = Math.max(0, Math.min(0.2, getSystemProperty('heatmap.inset') || '0'));
+
+if(inset) options.axisInset = inset;
 
 setFlow('heatmap',{keys:'ipsource'+ipLayer+',ipdestination'+ipLayer,value:value,filter:filter,n:20,t:t});
 
@@ -30,6 +33,13 @@ function ip2int(ip) {
 var min = ip2int(minIP);
 var max = ip2int(maxIP);
 var range = max - min;
+var maxVal = 2 ** 32 - 1;
+
+function scaleValue(val) {
+  if(val < min) return (val / min) * inset;
+  if(val > max) return (1 - inset) + (((val - max) / (maxVal - max)) * inset);
+  return ((val - min) / range) * (1 - (2 * inset)) + inset; 
+}
 
 function getFlows() {
   var result = [];
@@ -39,14 +49,14 @@ function getFlows() {
     let rec = flows[i];
     let [src,dst] = rec.key.split(',');
     let x = ip2int(src);
-    if(x < min || x > max) {
+    if(inset == 0 && (x < min || x > max)) {
       continue;
     } 
     let y = ip2int(dst);
-    if(y < min || y > max) {
+    if(inset == 0 && (y < min || y > max)) {
       continue;
     }
-    result.push({x:(x-min)/range,y:(y-min)/range,z:Math.log10(rec.value) / maxVal});
+    result.push({x:scaleValue(x),y:scaleValue(y),z:Math.log10(rec.value) / maxVal});
   }
   return result;
 }
