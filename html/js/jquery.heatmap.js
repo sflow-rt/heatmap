@@ -61,27 +61,24 @@
                 canvas.width = w;
             }
 
+            const radius = this.options.radius;
             const inset = this.options.axisInset;
             ctx.strokeStyle = this.options.axisColor;
             ctx.lineWidth = this.options.axisWidth;
             ctx.beginPath();
-            ctx.moveTo(0, 0);
-            ctx.lineTo(w, h);
-            if (inset > 0) {
-                ctx.moveTo(w * inset, 0);
-                ctx.lineTo(w * inset, h);
-                ctx.moveTo(w - (w * inset), 0);
-                ctx.lineTo(w - (w * inset), h);
-                ctx.moveTo(0, h * inset);
-                ctx.lineTo(w, h * inset);
-                ctx.moveTo(0, h - (h * inset));
-                ctx.lineTo(w, h - (h * inset));
-            }
-            for (let i = 0.1; i <= 0.9; i += 0.1) {
-                ctx.moveTo(w * inset + ((w * (1 - (2 * inset))) * i), h * inset);
-                ctx.lineTo(w * inset + ((w * (1 - (2 * inset))) * i), h * (1 - inset));
-                ctx.moveTo(w * inset, h * inset + ((h * (1 - (2 * inset))) * i));
-                ctx.lineTo(w * (1 - inset), h * inset + ((h * (1 - (2 * inset))) * i));
+            ctx.moveTo(radius, radius);
+            ctx.lineTo(radius, h - radius);
+            ctx.lineTo(w - radius, h - radius);
+            ctx.lineTo(w - radius, radius);
+            ctx.lineTo(radius, radius);
+            ctx.lineTo(w - radius, h - radius);
+            const gridWidth = w - (2 * radius);
+            const gridHeight = h - (2 * radius);            
+            for (let i = 0.0; i <= 1.0; i += 0.1) {
+                ctx.moveTo(gridWidth * inset + ((gridWidth * (1 - (2 * inset))) * i) + radius, gridHeight * inset + radius);
+                ctx.lineTo(gridWidth * inset + ((gridWidth * (1 - (2 * inset))) * i) + radius, h - (gridHeight * inset) - radius);
+                ctx.moveTo(gridWidth * inset + radius, gridHeight * inset + ((gridHeight * (1 - (2 * inset))) * i) + radius);
+                ctx.lineTo(w - (gridWidth * inset) - radius, gridHeight * inset + ((gridHeight * (1 - (2 * inset))) * i) + radius);
             }
             ctx.stroke();
 
@@ -89,12 +86,10 @@
             heatCanvas.width = canvas.width;
             heatCanvas.height = canvas.height;
             const heatCtx = heatCanvas.getContext('2d', {willReadFrequently: true});
-
-            const radius = this.options.radius;
             heatCtx.globalCompositeOperation = 'screen';
             points.forEach(p => {
-                const x = p.x * w;
-                const y = p.y * h;
+                const x = p.x * gridWidth + radius;
+                const y = p.y * gridHeight + radius;
                 const z = p.z;
                 const grad = heatCtx.createRadialGradient(x, y, 0, x, y, radius);
                 grad.addColorStop(0, `rgba(0,0,0,${z * 0.5})`);
