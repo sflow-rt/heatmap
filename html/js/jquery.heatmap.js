@@ -5,45 +5,52 @@
 
     function hslToRgb(h, s, l) {
         let r, g, b;
-        if (s === 0) r = g = b = l;
+        if (s === 0)
+            r = g = b = l;
         else {
             const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
             const p = 2 * l - q;
             const hue2rgb = (t) => {
-                if (t < 0) t += 1; if (t > 1) t -= 1;
-                if (t < 1/6) return p + (q - p) * 6 * t;
-                if (t < 1/2) return q;
-                if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+                if (t < 0)
+                    t += 1;
+                if (t > 1)
+                    t -= 1;
+                if (t < 1 / 6)
+                    return p + (q - p) * 6 * t;
+                if (t < 1 / 2)
+                    return q;
+                if (t < 2 / 3)
+                    return p + (q - p) * (2 / 3 - t) * 6;
                 return p;
             };
-            r = hue2rgb(h + 1/3); g = hue2rgb(h); b = hue2rgb(h - 1/3);
+            r = hue2rgb(h + 1 / 3);
+            g = hue2rgb(h);
+            b = hue2rgb(h - 1 / 3);
         }
         return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
     }
 
     $.widget('inmon.heatmap', {
         options: {
-            axisShow: true,
-            axisColor: '#eee',
+            axisColor: '#e0e0e0',
+            axisWidth: 2,
             axisInset: 0,
             radius: 10
         },
 
-        _create: function() {
+        _create: function () {
             this.element.addClass('heatmap');
             this._canvas = $('<canvas/>').appendTo(this.element);
-            this._points = [];
         },
 
-        draw: function(points) {
-            var canvas = this._canvas[0];
+        draw: function (points) {
+            const canvas = this._canvas[0];
             if (!canvas || !canvas.getContext)
                 return;
 
-            this._points = points;
-            var ctx = canvas.getContext('2d', { willReadFrequently: true });
-            var h = this._canvas.height();
-            var w = this._canvas.width();
+            const ctx = canvas.getContext('2d');
+            const h = this._canvas.height();
+            const w = this._canvas.width();
             var ratio = window.devicePixelRatio;
             if (ratio && ratio > 1) {
                 canvas.height = h * ratio;
@@ -53,52 +60,66 @@
                 canvas.height = h;
                 canvas.width = w;
             }
-            ctx.globalCompositeOperation = 'screen';
-            var radius = this.options.radius;
+
+            const inset = this.options.axisInset;
+            ctx.strokeStyle = this.options.axisColor;
+            ctx.lineWidth = this.options.axisWidth;
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.lineTo(w, h);
+            if (inset > 0) {
+                ctx.moveTo(w * inset, 0);
+                ctx.lineTo(w * inset, h);
+                ctx.moveTo(w - (w * inset), 0);
+                ctx.lineTo(w - (w * inset), h);
+                ctx.moveTo(0, h * inset);
+                ctx.lineTo(w, h * inset);
+                ctx.moveTo(0, h - (h * inset));
+                ctx.lineTo(w, h - (h * inset));
+            }
+            for (let i = 0.1; i <= 0.9; i += 0.1) {
+                ctx.moveTo(w * (inset + i), h * inset);
+                ctx.lineTo(w * (inset + i), h * (1 - inset));
+                ctx.moveTo(w * inset, h * (inset + i));
+                ctx.lineTo(w * (1 - inset), h * (inset + i));
+            }
+            ctx.stroke();
+
+            const heatCanvas = document.createElement('canvas');
+            heatCanvas.width = canvas.width;
+            heatCanvas.height = canvas.height;
+            const heatCtx = heatCanvas.getContext('2d', {willReadFrequently: true});
+
+            const radius = this.options.radius;
+            heatCtx.globalCompositeOperation = 'screen';
             points.forEach(p => {
                 const x = p.x * w;
                 const y = p.y * h;
                 const z = p.z;
-                const grad = ctx.createRadialGradient(x, y, 0, x, y, radius);
-                // Use the magnitude (z) to scale the opacity of the gradient
+                const grad = heatCtx.createRadialGradient(x, y, 0, x, y, radius);
                 grad.addColorStop(0, `rgba(0,0,0,${z * 0.5})`);
                 grad.addColorStop(1, 'rgba(0,0,0,0)');
-                ctx.fillStyle = grad;
-                ctx.fillRect(x - radius, y - radius, radius * 2, radius * 2);
-            }); 
-            const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                heatCtx.fillStyle = grad;
+                heatCtx.fillRect(x - radius, y - radius, radius * 2, radius * 2);
+            });
+            const imgData = heatCtx.getImageData(0, 0, heatCanvas.width, heatCanvas.height);
             const pixels = imgData.data;
             for (let i = 0; i < pixels.length; i += 4) {
                 const alpha = pixels[i + 3];
-                if (alpha > 0) {
+                if (alpha > 5) {
                     const hue = (1 - alpha / 255) * 240;
                     const rgb = hslToRgb(hue / 360, 1, 0.5);
                     pixels[i] = rgb[0];
                     pixels[i + 1] = rgb[1];
                     pixels[i + 2] = rgb[2];
-                    pixels[i + 3] = Math.min(255, alpha * 1.5);
+                    pixels[i + 3] = Math.min(255, alpha * 0.9);
+                } else {
+                    pixels[i + 3] = 0;
                 }
             }
-            ctx.globalCompositeOperation = 'source-over';
-            ctx.putImageData(imgData, 0, 0);
-            if(this.options.axisShow) {
-                ctx.strokeStyle = this.options.axisColor;
-                ctx.beginPath();
-                ctx.moveTo(0, 0);
-                ctx.lineTo(w, h);
-                if(this.options.axisInset) {
-                    let inset = this.options.axisInset;
-                    ctx.moveTo(w * inset, 0);
-                    ctx.lineTo(w * inset, h);
-                    ctx.moveTo(w - (w * inset), 0);
-                    ctx.lineTo(w - (w * inset), h);
-                    ctx.moveTo(0, h * inset);
-                    ctx.lineTo(w, h * inset);
-                    ctx.moveTo(0, h - (h * inset));
-                    ctx.lineTo(w, h - (h * inset));
-                }
-                ctx.stroke();
-            }
+            heatCtx.globalCompositeOperation = 'source-over';
+            heatCtx.putImageData(imgData, 0, 0);
+            ctx.drawImage(heatCanvas, 0, 0);
         }
     });
 })(jQuery);
