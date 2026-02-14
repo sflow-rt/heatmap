@@ -78,10 +78,10 @@
                 ctx.lineTo(w, h - (h * inset));
             }
             for (let i = 0.1; i <= 0.9; i += 0.1) {
-                ctx.moveTo(w * (inset + i), h * inset);
-                ctx.lineTo(w * (inset + i), h * (1 - inset));
-                ctx.moveTo(w * inset, h * (inset + i));
-                ctx.lineTo(w * (1 - inset), h * (inset + i));
+                ctx.moveTo(w * inset + ((w * (1 - (2 * inset))) * i), h * inset);
+                ctx.lineTo(w * inset + ((w * (1 - (2 * inset))) * i), h * (1 - inset));
+                ctx.moveTo(w * inset, h * inset + ((h * (1 - (2 * inset))) * i));
+                ctx.lineTo(w * (1 - inset), h * inset + ((h * (1 - (2 * inset))) * i));
             }
             ctx.stroke();
 
