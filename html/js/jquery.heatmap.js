@@ -35,7 +35,7 @@
             axisColor: '#e0e0e0',
             axisWidth: 2,
             axisInset: 0,
-            radius: 10
+            radius: 0.02
         },
 
         _create: function () {
@@ -61,7 +61,7 @@
                 canvas.width = w;
             }
 
-            const radius = this.options.radius;
+            const radius = this.options.radius * w;
             const inset = this.options.axisInset;
             ctx.strokeStyle = this.options.axisColor;
             ctx.lineWidth = this.options.axisWidth;

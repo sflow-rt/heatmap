@@ -1,11 +1,11 @@
 .heatmap {
-  width:100%;
-  height:800px;
-  border-width:thin;
-  border-style:solid;
-  border-color:black;
+    aspect-ratio: 1/1;
+    width:100%;
+    border-width:thin;
+    border-style:solid;
+    border-color:black;
 }
 .heatmap canvas {
-  height:100%;
-  width:100%;
+    height:100%;
+    width:100%;
 }

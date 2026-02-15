@@ -5,14 +5,23 @@ $(function() {
 
   $.get(optionsURL,function(opts) {
     var widget = $('#traffic').heatmap(opts);
+    var _data = [];
+    function draw(data) {
+      _data = data;
+      widget.heatmap('draw',_data);
+    }
+    function redraw() {
+      widget.heatmap('draw',_data);
+    }
+    $(window).resize(redraw);
     (function pollFlows() {
       $.ajax({
         url: dataURL,
         success: function(data) {
-          widget.heatmap('draw',data);
+          draw(data);
         },
         error: function(result,status,errorThrown) {
-          widget.heatmap('draw',[]);
+          draw([]);
         },
         complete: function() {
           setTimeout(pollFlows,opts.update || 1000);
