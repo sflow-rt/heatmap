@@ -66,14 +66,20 @@
             ctx.strokeStyle = this.options.axisColor;
             ctx.lineWidth = this.options.axisWidth;
             ctx.beginPath();
-            ctx.moveTo(radius, radius);
-            ctx.lineTo(radius, h - radius);
-            ctx.lineTo(w - radius, h - radius);
+            if (inset > 0) {
+                // outer range box
+                ctx.moveTo(radius, radius);
+                ctx.lineTo(radius, h - radius);
+                ctx.lineTo(w - radius, h - radius);
+                ctx.lineTo(w - radius, radius);
+                ctx.lineTo(radius, radius);
+            }
+            // diagonal
+            ctx.moveTo(radius, h - radius);
             ctx.lineTo(w - radius, radius);
-            ctx.lineTo(radius, radius);
-            ctx.lineTo(w - radius, h - radius);
+            // grid for inner range
             const gridWidth = w - (2 * radius);
-            const gridHeight = h - (2 * radius);            
+            const gridHeight = h - (2 * radius);
             for (let i = 0.0; i <= 1.0; i += 0.1) {
                 ctx.moveTo(gridWidth * inset + ((gridWidth * (1 - (2 * inset))) * i) + radius, gridHeight * inset + radius);
                 ctx.lineTo(gridWidth * inset + ((gridWidth * (1 - (2 * inset))) * i) + radius, h - (gridHeight * inset) - radius);
@@ -89,7 +95,7 @@
             heatCtx.globalCompositeOperation = 'screen';
             points.forEach(p => {
                 const x = p.x * gridWidth + radius;
-                const y = p.y * gridHeight + radius;
+                const y = (1 - p.y) * gridHeight + radius;
                 const z = p.z;
                 const grad = heatCtx.createRadialGradient(x, y, 0, x, y, radius);
                 grad.addColorStop(0, `rgba(0,0,0,${z * 0.5})`);
