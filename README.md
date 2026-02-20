@@ -24,6 +24,7 @@ Real-time visualization of a traffic matrix as a heatmap
 | heatmap.ip.start | 0.0.0.0 | First address in range |
 | heatmap.ip.end | 255.255.255.255 | Last address in range |
 | heatmap.ip.layer | | Set to ".1" to select innner addresses |
+| heatmap.inset | 0 | Fraction of display width to allocate to addresses outside range |
 | heatmap.topology.flow | ip | Flow type (ip, ip6, mac) |
 | heatmap.topology.refresh | 60000 | Timeout for cached address to switch port mappings |
 
