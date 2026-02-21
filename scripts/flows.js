@@ -8,7 +8,6 @@ var options = {};
 
 if(getSystemProperty('heatmap.update')) options.update = parseFloat(getSystemProperty('heatmap.update'));
 if(getSystemProperty('heatmap.radius')) options.radius = parseFloat(getSystemProperty('heatmap.radius'));
-if(getSystemProperty('heatmap.height')) options.height = getSystemProperty('heatmap.height');
 
 var agents    = (getSystemProperty('heatmap.agents')   || 'ALL').toUpperCase();
 var aggMode   = (getSystemProperty('heatmap.aggMode')  || 'max').toLowerCase();
