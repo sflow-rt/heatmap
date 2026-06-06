@@ -1,5 +1,7 @@
 # heatmap
-Real-time visualization of a traffic matrix as a heatmap
+Real-time visualization of a traffic matrix as a heatmap.
+
+[Real-time visualization of AI / ML traffic matrix](https://blog.sflow.com/2026/02/real-time-visualization-of-ai-ml.html)
 
 ## To install
 
