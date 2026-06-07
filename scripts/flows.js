@@ -1,6 +1,6 @@
 // author: InMon Corp.
-// version: 0.2
-// date: 2/19/2026
+// version: 0.3
+// date: 6/07/2026
 // description: Heatmap flow animation
 // copyright: Copyright (c) 2026 InMon Corp.
 
@@ -23,6 +23,7 @@ var inset     = Math.max(0, Math.min(0.2, getSystemProperty('heatmap.inset') || 
 var mode      = getSystemProperty('heatmap.mode')      || 'range';
 var flow      = getSystemProperty('heatmap.topology.flow') || 'ip';
 var refresh   = getSystemProperty('heatmap.topology.refresh') || 60000;
+var clickable = "yes" === getSystemProperty('heatmap.clickable');
 
 var flowKeys = {
   ip: 'ipsource,ipdestination',
@@ -30,6 +31,7 @@ var flowKeys = {
   mac: 'macsource,macdestination'
 };
 
+options.clickable = clickable;
 if(inset && 'range' == mode) options.axisInset = inset;
 
 var keys = 'topology' == mode ? flowKeys[flow] || flowKeys['mac'] : `ipsource${ipLayer},ipdestination${ipLayer}`;
@@ -131,7 +133,8 @@ function getFlows(now) {
       x = scaleValue(x);
       y = scaleValue(y);
     }
-    result.push({x:x,y:y,z:z});
+    if(clickable) result.push({x:x,y:y,z:z,info:[{name:'source',value:src},{name:'destination',value:dst}]});
+    else result.push({x:x,y:y,z:z});
   }
   return result;
 }

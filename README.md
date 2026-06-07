@@ -14,6 +14,7 @@ Real-time visualization of a traffic matrix as a heatmap.
 | Property | Default | Description |
 | -------- | ------- | ----------- |
 | heatmap.update | 1000 | Display update interval (in mS) |
+| heatmap.clickable | no | Display source/destination pair when mouse hovering |
 | heatmap.radius | 0.02 | Radius of each heatmap point (as a fraction of display width) |
 | heatmap.agents | ALL | Set of agents used to create heatmap |
 | heatmap.aggMode | MAX | How to aggregate flows across agents |
